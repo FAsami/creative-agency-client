@@ -1,0 +1,12 @@
+.image-upload{
+    width: 100%;
+    background: #DEFFED;
+    border: 1px solid #009444;
+    border-radius: 5px;
+}
+.image-upload > input{
+    display: none;
+}
+form::placeholder{
+    font-family: 'Poppins', sans-serif;
+}

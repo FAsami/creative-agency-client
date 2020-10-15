@@ -1,0 +1,11 @@
+.service-card{
+    border-radius: 20px;
+}
+.btn-pending {
+    color: #FF4545;
+    background-color: #FFE3E3;
+}
+.btn-done{
+    color:  #009444;
+    background-color: #C6FFE0;
+}

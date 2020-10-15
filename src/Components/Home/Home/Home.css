@@ -1,0 +1,6 @@
+.hero{
+    background-image: url('../../../image/bottom_layer.png');
+    height: 685px;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
