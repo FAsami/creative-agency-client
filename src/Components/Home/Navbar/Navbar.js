@@ -2,11 +2,9 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import logo from '../../../image/logo.png'
 import './Navbar.css';
-
+import 'bootstrap/js/src/collapse.js';
 function Navbar() {
     const navClasses = 'nav-item nav-link px-4';
-    const token = sessionStorage.getItem('token');
-    const name = sessionStorage.getItem('name');
     return (
         <nav className="navbar navbar-expand-lg navbar-light">
             <div className="container">
@@ -26,15 +24,14 @@ function Navbar() {
                         </Link>
                         <Link className={navClasses} to="/">Our Portfolio</Link>
                         <Link className={navClasses} to="/">Our Team</Link>
-                        <Link className={navClasses} to="/">Contact us</Link>
-                        <Link className={!token ? navClasses : 'd-none'}
+                        <Link className={navClasses} to="/dashboard/admin/ServiceList">Admin</Link>
+                        <Link className={navClasses}
                             to="/login">
                             <button className="btn px-5"
                                 style={{ color: "#fff", fontSize: '16px', backgroundColor: '#111430' }}>
                                 Login
                             </button>
                         </Link>
-                        <Link className={`${navClasses} disabled font-weight-bold text-dark`} to='/' disabled>{token ? name : null}</Link>
                     </div>
                 </div>
             </div>

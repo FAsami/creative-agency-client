@@ -6,26 +6,45 @@ import './Order.css';
 import { useContext } from 'react';
 import { UserContext } from '../../../../App';
 import { useEffect } from 'react';
+import { firebaseApp, storage } from '../../../../Configs/firebaseConfig';
 
 
 function Order() {
     const { user } = useContext(UserContext);
     const [info, setInfo] = useState({});
-    const [file, setFile] = useState(null);
     const { register, errors, handleSubmit } = useForm();
     const [service, setService] = useState([]);
+    const [file, setFile] = useState(null);
+    const [imageURL, setImageURL] = useState('');
+    const [showAlert, setShowAlert] = useState(false);
+
+
+    const handleImageUpload = () => {
+        const storageRef = firebaseApp.storage().ref(`event/${file.name}`);
+        const task = storageRef.put(file);
+        task.on(
+            'state_changed',
+            (snapshot) => {
+                const percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            },
+            (error) => console.log(error),
+            () =>
+                storage
+                    .ref('event')
+                    .child(file.name)
+                    .getDownloadURL()
+                    .then((url) => setImageURL(url))
+        );
+    }
 
     useEffect(() => {
-        fetch(`http://localhost:5000/service/${title}`)
+        if (id === null) id = '5f8871acffbe351bf0973c9c';
+        fetch(`https://frozen-harbor-18792.herokuapp.com/service/${id}`)
             .then(res => res.json()).then(data => {
                 setService(data);
             });
     }, []);
 
-
-    const handleFileChange = (e) => {
-        setFile(e.target.files[0])
-    }
     const handleBlur = (e) => {
         const name = e.target.name;
         const value = e.target.value;
@@ -38,35 +57,39 @@ function Order() {
     }
 
     let query = useQuery();
-    const title = query.get('title');
+    let id = query.get('id');
 
 
     const onSubmit = () => {
-        const formData = new FormData()
-        formData.append('file', file);
-        formData.append('name', info.name);
-        formData.append('email', info.email);
-        formData.append('subject', info.subject);
+        handleImageUpload();
+        const formData = new FormData();
+        formData.append('project_image', imageURL);
+        formData.append('name', user.name);
+        formData.append('email', user.email);
+        formData.append('subject', service.title);
         formData.append('details', info.description);
         formData.append('price', info.price);
         formData.append('status', 'pending');
         formData.append('service_id', service._id);
-        formData.append('service_image', service.image.img);
-        formData.append('service_image_type', service.image.contentType);
+        formData.append('service_image', service.imageUrl);
 
-
-
-        fetch('http://localhost:5000/placeOrder', {
-            method: 'POST',
-            body: formData,
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
+        if (imageURL) {
+            fetch('https://frozen-harbor-18792.herokuapp.com/placeOrder', {
+                method: 'POST',
+                body: formData,
             })
-            .catch(error => {
-                console.error(error)
-            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        setShowAlert(true);
+                        setTimeout(() => setShowAlert(false), 3000);
+                    }
+                })
+                .catch(error => {
+                    console.error(error)
+                })
+        }
+
     }
 
     const inputClasses = 'form-control bg-light my-2 py-4';
@@ -76,6 +99,7 @@ function Order() {
             <div className='row'>
                 <div className="col-sm-12 col-md-9">
                     <form onSubmit={handleSubmit(onSubmit)}>
+                        {showAlert && <div className="alert alert-success">Order placed successfully</div>}
                         <input
                             type="text"
                             className={errors.name ? `${inputClasses} is-invalid` : inputClasses}
@@ -142,7 +166,7 @@ function Order() {
                                         id="file-input"
                                         type="file"
                                         name='file'
-                                        onChange={(e) => handleFileChange(e)}
+                                        onChange={(e) => setFile(e.target.files[0])}
                                         ref={register({ required: false })}
                                     />
                                 </div>

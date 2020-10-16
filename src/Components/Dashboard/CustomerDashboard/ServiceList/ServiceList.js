@@ -9,11 +9,24 @@ function ServiceList() {
     const { user } = useContext(UserContext);
 
     useEffect(() => {
-        fetch(`http://localhost:5000/orders/${user.email}`)
+        fetch(`https://frozen-harbor-18792.herokuapp.com/orders/${user.email}`)
             .then(res => res.json()).then(data => {
                 setOrderedServices(data);
             });
     }, []);
+
+    const statusClass = (status) => {
+        let statusClasses = '';
+        if (status === 'On Going') {
+            statusClasses = 'btn btn-sm btn-ongoing'
+        } else if (status === 'pending') {
+            statusClasses = 'btn btn-sm btn-pending'
+        } else {
+            statusClasses = 'btn btn-sm btn-done'
+        }
+        return statusClasses;
+    }
+
     return (
         <div style={{ backgroundColor: '#E5E5E5', height: '90vh' }} className='py-4 px-5'>
             <div className="row">
@@ -22,10 +35,14 @@ function ServiceList() {
                         <div className="card service-card p-3">
                             <div className="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <img src={`data:${order.service_image_type};base64,${order.service_image}`} alt={order.subject} />
+                                    <img
+                                        className='image-fluid'
+                                        style={{ height: '50px' }}
+                                        src={order.service_image}
+                                        alt={order.subject} />
                                 </div>
                                 <div>
-                                    <button className="btn btn-sm btn-done">{order.status}</button>
+                                    <button className={statusClass(order.status)}>{order.status}</button>
                                 </div>
                             </div>
                             <div>

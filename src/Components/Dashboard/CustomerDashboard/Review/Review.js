@@ -6,6 +6,7 @@ function Review() {
     const { user } = useContext(UserContext);
     const [info, setInfo] = useState({});
     const { handleSubmit, register, errors } = useForm();
+    const [showAlert, setShowAlert] = useState(false);
     const handleBlur = (e) => {
         const name = e.target.name;
         const value = e.target.value;
@@ -20,13 +21,16 @@ function Review() {
         formData.append('designation', info.designation);
         formData.append('description', info.description);
 
-        fetch('http://localhost:5000/addReview', {
+        fetch('https://frozen-harbor-18792.herokuapp.com/addReview', {
             method: 'POST',
             body: formData,
         })
             .then(response => response.json())
             .then(data => {
-                console.log(data)
+                if (data) {
+                    setShowAlert(true);
+                    setTimeout(() => setShowAlert(false), 3000);
+                }
             })
             .catch(error => {
                 console.error(error)
@@ -38,6 +42,7 @@ function Review() {
         <div style={{ backgroundColor: '#E5E5E5', height: '90vh' }} className='py-4 px-5'>
             <div className='row'>
                 <div className="col-sm-12 col-md-9">
+                    {showAlert && <div className="alert alert-success">Review addedd successfully</div>}
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <input
                             type="text"

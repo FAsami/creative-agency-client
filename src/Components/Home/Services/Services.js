@@ -3,13 +3,10 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import "./Services.css"
 
-
-
-
 function Services() {
     const [services, setServices] = useState([]);
     useEffect(() => {
-        fetch('http://localhost:5000/services')
+        fetch('https://frozen-harbor-18792.herokuapp.com/services')
             .then(res => res.json())
             .then(data => setServices(data));
     }, []);
@@ -26,10 +23,10 @@ function Services() {
             <div className="row">
                 {services.map(service =>
                     <div className='col-sm-6 col-md-4' key={service._id}>
-                        <Link className='link' to={`/dashboard/Order?title=${service._id}`}>
-                            <div className="card border-0 text-center service-card">
+                        <Link className='link' to={`/dashboard/Order?id=${service._id}`}>
+                            <div className="card text-center border-0 py-3 cardItem">
                                 <div className='d-flex justify-content-center'>
-                                    <img src={`data:${service.image.contentType};base64,${service.image.img}`}
+                                    <img src={service.imageUrl}
                                         className='image-fluid' alt={service.title}
                                         style={{ maxHeight: '75px', maxWidth: '75px' }} />
                                 </div>
@@ -45,3 +42,22 @@ function Services() {
 }
 
 export default Services;
+
+
+
+
+
+
+// function Card() {
+
+//   return (
+//     <div class="container" onMouseMove={({ clientX: x, clientY: y }) => set({ xy: calc(x, y) })}>
+//       <animated.div class="card1" style={{ transform: props.xy.interpolate(trans1) }} />
+//       <animated.div class="card2" style={{ transform: props.xy.interpolate(trans2) }} />
+//       <animated.div class="card3" style={{ transform: props.xy.interpolate(trans3) }} />
+//       <animated.div class="card4" style={{ transform: props.xy.interpolate(trans4) }} />
+//     </div>
+//   )
+// }
+
+

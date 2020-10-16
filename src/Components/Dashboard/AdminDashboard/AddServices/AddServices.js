@@ -3,47 +3,84 @@ import { HiOutlineCloudUpload } from 'react-icons/hi';
 import { useForm } from "react-hook-form";
 import './AddServices.css';
 import { UserContext } from '../../../../App';
+import { firebaseApp, storage } from '../../../../Configs/firebaseConfig';
 
 
 function AddServices() {
     const { user } = useContext(UserContext);
     const [info, setInfo] = useState({});
-    const [file, setFile] = useState(null);
     const { handleSubmit, register, errors } = useForm();
+    const [file, setFile] = useState(null);
+    const [imageURL, setImageURL] = useState('');
+    const [uploadPercentage, setUploadPercentage] = useState('');
+    const [alert, setAlert] = useState({});
+    const [showAlert, setShowAlert] = useState(false);
+
+
+    const handleImageUpload = () => {
+        const storageRef = firebaseApp.storage().ref(`event/${file.name}`);
+        const task = storageRef.put(file);
+        task.on(
+            'state_changed',
+            (snapshot) => {
+                const percentage =
+                    (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                setUploadPercentage(`Uploading:  ${Math.round(percentage)}`);
+            },
+            (error) => console.log(error),
+            () =>
+                storage
+                    .ref('event')
+                    .child(file.name)
+                    .getDownloadURL()
+                    .then((url) => setImageURL(url))
+        );
+    }
     const handleBlur = (e) => {
         const name = e.target.name;
         const value = e.target.value;
         setInfo({ ...info, [name]: value });
     }
-    const handleFileChange = (e) => {
-        setFile(e.target.files[0])
-    }
     const onSubmit = () => {
+        handleImageUpload();
         const formData = new FormData()
-        formData.append('file', file);
         formData.append('name', user.name);
         formData.append('email', user.email);
         formData.append('title', info.title);
+        formData.append('imageUrl', imageURL);
         formData.append('description', info.description);
 
-        fetch('http://localhost:5000/addService', {
-            method: 'POST',
-            body: formData,
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
+        if (imageURL) {
+            fetch('https://frozen-harbor-18792.herokuapp.com/addService', {
+                method: 'POST',
+                body: formData,
             })
-            .catch(error => {
-                console.error(error)
-            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result) {
+                        setAlert({ type: 'success', msg: 'Service added successfully' });
+                        setShowAlert(true);
+                        setTimeout(() => setShowAlert(false), 3000);
+                        setFile(null);
+                        setInfo({});
+                        setImageURL('');
+                        setUploadPercentage('');
+                    }
+                })
+                .catch(error => {
+                    setAlert({ type: 'danger', msg: 'Failed to add service, Please try again!' });
+                    setShowAlert(true);
+                    setTimeout(() => setShowAlert(false), 3000);
+                    console.log(error);
+                })
+        }
     }
-
 
     return (
         <div style={{ backgroundColor: '#E5E5E5', height: '90vh' }} className='py-4 px-5'>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="card  p-5" style={{ borderRadius: '20px' }}>
+                    {showAlert ? <div className={`alert alert-${alert.type}`}>{alert.msg}</div> : null}
                     <div className="row my-2">
                         <div className="col-md-6">
                             <p className='text-brand font-weight-bold'>Service title</p>
@@ -67,10 +104,14 @@ function AddServices() {
                                     id="file-input"
                                     type="file"
                                     name='file'
-                                    onChange={handleFileChange}
+                                    onChange={(e) => setFile(e.target.files[0])}
                                     ref={register({ required: true })}
                                 />
                             </div>
+                            <p>
+                                <small className='text-dark'>{file ? file.name : null}</small>
+                                <small className='text-success'>{uploadPercentage === ' Uploading:  100' ? ' File uploaded successfully' : uploadPercentage}</small>
+                            </p>
                             {errors.file && <small className='text-danger'>Please upload a file</small>}
                         </div>
                     </div>

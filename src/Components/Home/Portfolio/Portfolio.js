@@ -8,32 +8,40 @@ import 'react-multi-carousel/lib/styles.css';
 function Portfolio() {
     const responsive = {
         superLargeDesktop: {
-            breakpoint: { max: 4000, min: 3000 },
+            breakpoint: { max: 4000, min: 1200 },
             items: 5
         },
         desktop: {
-            breakpoint: { max: 3000, min: 1024 },
+            breakpoint: { max: 1199, min: 992 },
             items: 3
         },
         tablet: {
-            breakpoint: { max: 1024, min: 464 },
+            breakpoint: { max: 991, min: 768 },
             items: 2
         },
         mobile: {
-            breakpoint: { max: 464, min: 0 },
+            breakpoint: { max: 767, min: 0 },
             items: 1
         }
     };
 
 
-
     return (<>
-        <div style={{ backgroundColor: "#111430" }} className='mt-5 p-5'>
-            <h3 className="text-white font-weight-bold text-center pt-5">
+        <div style={{ backgroundColor: "#111430", position: 'relative' }} className='mt-5 p-5'>
+            <h3 className="text-white font-weight-bold text-center py-5">
                 Here are some of
                 <span className='text-brand-green'> our works</span>
             </h3>
-            <Carousel responsive={responsive} arrows={false} showDots={true} >
+            <Carousel
+                responsive={responsive}
+                arrows={false}
+                showDots={true}
+                autoPlay={true}
+                keyBoardControl={true}
+                infinite={true}
+                renderDotsOutside={true}
+                dotListClass='my-3'
+            >
                 <div className="col-md-4">
                     <img src={carousel1} className='image-fluid' alt="None" style={{ maxHeight: '300px', maxWidth: '300px' }} />
                 </div>

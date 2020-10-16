@@ -1,12 +1,10 @@
-.service-card:hover {
-    transition: background-color 0.5s ease;
-    background-color: #7AB259;
-    cursor: pointer;
+.cardItem{
+  transition: all 500ms ease-in-out;
 }
-.link{
-    text-decoration: none;
+.cardItem:hover {
+  background-color: rgb(224, 224, 224);
+  margin-top: 20px;
+  cursor: pointer;
+  box-shadow: 0px 12px 30px 0px rgba(0, 0, 0, 0.2);
+  transition: all 800ms cubic-bezier(0.19, 1, 0.22, 1);
 }
-.link:hover{
-    text-decoration: none;
-}
-

@@ -16,27 +16,16 @@ function Login() {
     let location = useLocation();
     let { from } = location.state || { from: { pathname: "/" } };
 
-
     const handleSignIn = () => {
         const provider = new firebase.auth.GoogleAuthProvider();
         firebaseApp.auth().signInWithPopup(provider).then((result) => {
             const user = { name: result.user.displayName, email: result.user.email, image: result.user.photoURL }
             setUser(user);
-            storeAuthToken();
+            history.replace(from);
         }).catch((error) => {
             const errorMessage = error.message;
             setLoginError(errorMessage);
         });
-    }
-
-    const storeAuthToken = () => {
-        firebase.auth().currentUser.getIdToken(/* forceRefresh */ true)
-            .then(function (idToken) {
-                sessionStorage.setItem('token', idToken);
-                history.replace(from);
-            }).catch(function (error) {
-                console.log(error);
-            });
     }
 
     return (
