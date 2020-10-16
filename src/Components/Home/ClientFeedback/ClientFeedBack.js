@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react'
+import gif from "../../../image/loading.gif"
 
 function ClientFeedBack() {
     const [client, setClient] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        setLoading(true);
         fetch('https://frozen-harbor-18792.herokuapp.com/reviews')
             .then(res => res.json())
-            .then(data => setClient(data));
+            .then(data => {
+                setLoading(false);
+                setClient(data);
+            });
     }, []);
 
     return (
@@ -15,7 +21,8 @@ function ClientFeedBack() {
                 Client
                 <span className='text-brand-green'> Feedback</span>
             </h3>
-            <div className="row mx-3">
+            {loading && <div className="d-flex justify-content-center"><img src={gif} alt='loading' /></div>}
+            {!loading && <div className="row mx-3">
                 {client.map(client =>
                     <div className="col-md-4 mt-5" key={client._id}>
                         <div className="card">
@@ -36,7 +43,7 @@ function ClientFeedBack() {
                         </div>
                     </div>
                 )}
-            </div>
+            </div>}
         </div>
     )
 }

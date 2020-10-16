@@ -2,13 +2,19 @@ import React, { useState } from 'react'
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import "./Services.css"
-
+import gif from "../../../image/loading.gif"
 function Services() {
     const [services, setServices] = useState([]);
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
+        setLoading(true);
         fetch('https://frozen-harbor-18792.herokuapp.com/services')
             .then(res => res.json())
-            .then(data => setServices(data));
+            .then(data => {
+                setLoading(false);
+                setServices(data);
+            });
     }, []);
 
 
@@ -20,7 +26,8 @@ function Services() {
                 <span className='text-brand-green'> services</span>
                 </h3>
             </div>
-            <div className="row">
+            {loading && <div className="d-flex justify-content-center"><img src={gif} alt='loading' /></div>}
+            {!loading && <div className="row">
                 {services.map(service =>
                     <div className='col-sm-6 col-md-4' key={service._id}>
                         <Link className='link' to={`/dashboard/Order?id=${service._id}`}>
@@ -36,7 +43,7 @@ function Services() {
                         </Link>
                     </div>
                 )}
-            </div>
+            </div>}
         </div>
     )
 }
