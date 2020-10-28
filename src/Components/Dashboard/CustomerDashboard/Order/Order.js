@@ -1,49 +1,28 @@
 import React, { useState } from 'react';
-import { HiOutlineCloudUpload } from 'react-icons/hi';
 import { useForm } from "react-hook-form";
 import { useLocation } from 'react-router-dom';
 import './Order.css';
 import { useContext } from 'react';
 import { UserContext } from '../../../../App';
 import { useEffect } from 'react';
-import { firebaseApp, storage } from '../../../../Configs/firebaseConfig';
-
+import ImageUpload from './ImageUpload';
+import queryString from 'query-string';
 
 function Order() {
     const { user } = useContext(UserContext);
     const [info, setInfo] = useState({});
     const { register, errors, handleSubmit } = useForm();
     const [service, setService] = useState([]);
-    const [file, setFile] = useState(null);
     const [imageURL, setImageURL] = useState('');
     const [showAlert, setShowAlert] = useState(false);
-
-
-    const handleImageUpload = () => {
-        const storageRef = firebaseApp.storage().ref(`event/${file.name}`);
-        const task = storageRef.put(file);
-        task.on(
-            'state_changed',
-            (snapshot) => {
-                const percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            },
-            (error) => console.log(error),
-            () =>
-                storage
-                    .ref('event')
-                    .child(file.name)
-                    .getDownloadURL()
-                    .then((url) => setImageURL(url))
-        );
-    }
+    const { id } = queryString.parse(useLocation().search);
 
     useEffect(() => {
-        if (id === null) id = '5f8871acffbe351bf0973c9c';
-        fetch(`https://frozen-harbor-18792.herokuapp.com/service/${id}`)
+        fetch(`https://frozen-harbor-18792.herokuapp.com/service/${id || '5f8871acffbe351bf0973c9c'}`)
             .then(res => res.json()).then(data => {
                 setService(data);
             });
-    }, []);
+    }, [id]);
 
     const handleBlur = (e) => {
         const name = e.target.name;
@@ -51,18 +30,8 @@ function Order() {
         setInfo({ ...info, [name]: value });
     }
 
-
-    function useQuery() {
-        return new URLSearchParams(useLocation().search);
-    }
-
-    let query = useQuery();
-    let id = query.get('id');
-
-
     const onSubmit = () => {
-        handleImageUpload();
-        const formData = new FormData();
+        let formData = new FormData();
         formData.append('project_image', imageURL);
         formData.append('name', user.name);
         formData.append('email', user.email);
@@ -157,19 +126,7 @@ function Order() {
                             </div>
 
                             <div className="col-md-6">
-                                <div className="image-upload py-1 my-2 text-center">
-                                    <label
-                                        htmlFor="file-input">
-                                        <HiOutlineCloudUpload /> Upload project image
-                                    </label>
-                                    <input
-                                        id="file-input"
-                                        type="file"
-                                        name='file'
-                                        onChange={(e) => setFile(e.target.files[0])}
-                                        ref={register({ required: false })}
-                                    />
-                                </div>
+                                <ImageUpload label='Upload project Image' setImageURL={setImageURL} />
                             </div>
                         </div>
                         <button

@@ -1,19 +1,20 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
+import gif from "../../../../image/loading.gif"
 
 function AllServices() {
     const [showAlert, setShowAlert] = useState(false);
     const [allServices, setAllServices] = useState([]);
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
+        setLoading(true);
         fetch(`https://frozen-harbor-18792.herokuapp.com/orders`)
             .then(res => res.json()).then(data => {
+                setLoading(false);
                 setAllServices(data);
             });
     }, []);
-
-
-
-
     const handleChange = (e, serviceId) => {
         const status = e.target.value;
         fetch(`https://frozen-harbor-18792.herokuapp.com/updateServiceStatus/${serviceId}`, {
@@ -30,7 +31,8 @@ function AllServices() {
 
     return (
         <div style={{ backgroundColor: '#E5E5E5', height: '90vh' }} className='py-4 px-2'>
-            <div className="card  p-5" style={{ borderRadius: '20px' }}>
+            {loading && <div className="d-flex justify-content-center"><img src={gif} alt='loading' /></div>}
+            {!loading && <div className="card  p-5" style={{ borderRadius: '20px' }}>
                 {showAlert && <div className="alert alert-success">Status changed successfully</div>}
                 <table className="table table-borderless">
                     <thead>
@@ -60,7 +62,7 @@ function AllServices() {
                         )}
                     </tbody>
                 </table>
-            </div>
+            </div>}
         </div>
     )
 }

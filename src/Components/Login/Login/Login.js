@@ -21,11 +21,22 @@ function Login() {
         firebaseApp.auth().signInWithPopup(provider).then((result) => {
             const user = { name: result.user.displayName, email: result.user.email, image: result.user.photoURL }
             setUser(user);
-            history.replace(from);
+            storeAuthToken();
+            // history.replace(from);
         }).catch((error) => {
             const errorMessage = error.message;
             setLoginError(errorMessage);
         });
+    }
+    const storeAuthToken = () => {
+        firebase.auth().currentUser.getIdToken(/* forceRefresh */ true)
+            .then(function (idToken) {
+                sessionStorage.setItem('token', idToken);
+                console.log(idToken);
+                history.replace(from);
+            }).catch(function (error) {
+                // Handle error
+            });
     }
 
     return (

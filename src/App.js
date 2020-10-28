@@ -9,11 +9,19 @@ import AdminDashBoard from './Components/Dashboard/AdminDashboard/AdminDashBoard
 import NotFound from './Components/NotFound/NotFound';
 import PrivateRoute from './Components/Login/PrivateRoute/PrivateRoute';
 import Login from './Components/Login/Login/Login';
-
+import jwt_decode from "jwt-decode";
+import { useEffect } from 'react';
 export const UserContext = createContext();
 
 function App() {
   const [user, setUser] = useState({});
+  useEffect(() => {
+    const token = sessionStorage.getItem('token');
+    if (token) {
+      const decodedToken = jwt_decode(token);
+      setUser({ name: decodedToken.name, email: decodedToken.email })
+    }
+  }, []);
 
   return (
     <div className="main-container">

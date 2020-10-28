@@ -1,48 +1,24 @@
 import React, { useContext, useState } from 'react';
-import { HiOutlineCloudUpload } from 'react-icons/hi';
 import { useForm } from "react-hook-form";
 import './AddServices.css';
 import { UserContext } from '../../../../App';
-import { firebaseApp, storage } from '../../../../Configs/firebaseConfig';
+import ImageUpload from '../../CustomerDashboard/Order/ImageUpload';
 
 
 function AddServices() {
     const { user } = useContext(UserContext);
     const [info, setInfo] = useState({});
     const { handleSubmit, register, errors } = useForm();
-    const [file, setFile] = useState(null);
     const [imageURL, setImageURL] = useState('');
-    const [uploadPercentage, setUploadPercentage] = useState('');
     const [alert, setAlert] = useState({});
     const [showAlert, setShowAlert] = useState(false);
 
-
-    const handleImageUpload = () => {
-        const storageRef = firebaseApp.storage().ref(`event/${file.name}`);
-        const task = storageRef.put(file);
-        task.on(
-            'state_changed',
-            (snapshot) => {
-                const percentage =
-                    (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                setUploadPercentage(`Uploading:  ${Math.round(percentage)}`);
-            },
-            (error) => console.log(error),
-            () =>
-                storage
-                    .ref('event')
-                    .child(file.name)
-                    .getDownloadURL()
-                    .then((url) => setImageURL(url))
-        );
-    }
     const handleBlur = (e) => {
         const name = e.target.name;
         const value = e.target.value;
         setInfo({ ...info, [name]: value });
     }
     const onSubmit = () => {
-        handleImageUpload();
         const formData = new FormData()
         formData.append('name', user.name);
         formData.append('email', user.email);
@@ -61,10 +37,7 @@ function AddServices() {
                         setAlert({ type: 'success', msg: 'Service added successfully' });
                         setShowAlert(true);
                         setTimeout(() => setShowAlert(false), 3000);
-                        setFile(null);
                         setInfo({});
-                        setImageURL('');
-                        setUploadPercentage('');
                     }
                 })
                 .catch(error => {
@@ -96,23 +69,7 @@ function AddServices() {
                         </div>
                         <div className="col-md-6">
                             <p className='text-brand font-weight-bold'>Icon</p>
-                            <div className="image-upload  py-1 text-center">
-                                <label htmlFor="file-input">
-                                    <HiOutlineCloudUpload /> Icon
-                            </label>
-                                <input
-                                    id="file-input"
-                                    type="file"
-                                    name='file'
-                                    onChange={(e) => setFile(e.target.files[0])}
-                                    ref={register({ required: true })}
-                                />
-                            </div>
-                            <p>
-                                <small className='text-dark'>{file ? file.name : null}</small>
-                                <small className='text-success'>{uploadPercentage === ' Uploading:  100' ? ' File uploaded successfully' : uploadPercentage}</small>
-                            </p>
-                            {errors.file && <small className='text-danger'>Please upload a file</small>}
+                            <ImageUpload label="Icon" setImageURL={setImageURL} />
                         </div>
                     </div>
                     <p className='text-brand font-weight-bold'>Description</p>

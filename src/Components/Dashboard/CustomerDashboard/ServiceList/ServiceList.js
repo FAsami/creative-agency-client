@@ -1,19 +1,25 @@
 import React, { useState } from 'react';
 import { useContext } from 'react';
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { UserContext } from '../../../../App';
+import gif from '../../../../image/loading.gif';
 import './ServiceList.css';
 
 function ServiceList() {
     const [orderedServices, setOrderedServices] = useState([]);
+    const [loading, setLoading] = useState(false);
     const { user } = useContext(UserContext);
 
     useEffect(() => {
+        setLoading(true);
         fetch(`https://frozen-harbor-18792.herokuapp.com/orders/${user.email}`)
             .then(res => res.json()).then(data => {
+                console.log(data.length);
+                setLoading(false);
                 setOrderedServices(data);
             });
-    }, []);
+    }, [user.email]);
 
     const statusClass = (status) => {
         let statusClasses = '';
@@ -26,10 +32,18 @@ function ServiceList() {
         }
         return statusClasses;
     }
+    if (!loading && orderedServices.length < 1) {
+        return (
+            <div style={{ backgroundColor: '#E5E5E5' }} className='py-4 px-5'>
+                <h5 className="text-center text-secondary">No service ordered yet! <Link className='text-primary' to='/'>Add some services</Link></h5>              </div>
+        )
+    }
 
     return (
-        <div style={{ backgroundColor: '#E5E5E5', height: '90vh' }} className='py-4 px-5'>
-            <div className="row">
+        <div style={{ backgroundColor: '#E5E5E5' }} className='py-4 px-5'>
+            {loading && <div className="d-flex justify-content-center"><img src={gif} alt="Loading" /></div>}
+            {!loading && <div className="row">
+
                 {orderedServices.map(order =>
                     <div className="col-md-6 mb-3" key={order._id}>
                         <div className="card service-card p-3">
@@ -52,7 +66,7 @@ function ServiceList() {
                         </div>
                     </div>
                 )}
-            </div>
+            </div>}
         </div>
     )
 }

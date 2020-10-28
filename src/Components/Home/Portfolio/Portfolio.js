@@ -27,7 +27,7 @@ function Portfolio() {
 
 
     return (<>
-        <div style={{ backgroundColor: "#111430", position: 'relative' }} className='mt-5 p-5'>
+        <div id='portfolio' style={{ backgroundColor: "#111430", position: 'relative' }} className='mt-5 p-5'>
             <h3 className="text-white font-weight-bold text-center py-5">
                 Here are some of
                 <span className='text-brand-green'> our works</span>
